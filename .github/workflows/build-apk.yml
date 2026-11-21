@@ -1,0 +1,34 @@
+
+name: Build el3abbasylive APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract project
+        run: unzip -q "el3abbasylive-android-project(2).zip" -d source
+
+      - name: Build APK
+        run: gradle --no-daemon -p source/el3abbasylive-android assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: el3abbasylive-debug-apk
+          path: source/el3abbasylive-android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
